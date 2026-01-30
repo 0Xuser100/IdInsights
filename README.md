@@ -61,14 +61,18 @@ npx convex dev
 
 ## Configuration
 
-Create `.env`:
+Copy `.env.example` to `.env` and fill in your values:
+```bash
+cp .env.example .env
+```
+
 ```env
-GOOGLE_APPLICATION_CREDENTIALS=astrik-9102451dae99.json
-GCP_PROJECT_ID=215297851036
+GOOGLE_APPLICATION_CREDENTIALS=<your-service-account.json>
+GCP_PROJECT_ID=<from Google Cloud Console>
 GCP_LOCATION=us
-GCP_PROCESSOR_ID=178745fbdde45a70
-OPENAI_API_KEY=your_openai_key
-CONVEX_URL=https://your-deployment.convex.cloud
+GCP_PROCESSOR_ID=<from Document AI Console>
+OPENAI_API_KEY=<from platform.openai.com>
+CONVEX_URL=<from npx convex dev>
 ```
 
 ## Run
