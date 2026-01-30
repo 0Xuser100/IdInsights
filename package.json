@@ -1,0 +1,11 @@
+{
+  "name": "idinsights",
+  "version": "1.0.0",
+  "description": "Egyptian National ID Scanner using Document AI and Convex",
+  "scripts": {
+    "convex": "convex dev"
+  },
+  "dependencies": {
+    "convex": "^1.31.7"
+  }
+}

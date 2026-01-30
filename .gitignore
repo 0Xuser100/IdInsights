@@ -1,0 +1,38 @@
+# Environment variables
+.env
+.env.local
+
+# Secrets
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Claude
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.Python
+
+# Uploads (contains user data)
+uploads/
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Convex generated files
+convex/_generated/
+
+# OS
+.DS_Store
+Thumbs.db
+

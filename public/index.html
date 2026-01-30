@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماسح البطاقة الشخصية المصرية</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #00d9ff;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .upload-box {
+            border: 2px dashed #00d9ff;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-box:hover {
+            background: rgba(0, 217, 255, 0.1);
+        }
+        .upload-box.has-file {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        .upload-box input {
+            display: none;
+        }
+        .upload-box img {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        .btn {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .result-label {
+            color: #00d9ff;
+        }
+        .result-value {
+            color: #fff;
+            text-align: left;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 217, 255, 0.3);
+            border-top-color: #00d9ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .ocr-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .section-title {
+            color: #00d9ff;
+            margin: 20px 0 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪪 ماسح البطاقة الشخصية المصرية</h1>
+
+        <div class="card">
+            <h2>رفع الصور</h2>
+            <div class="upload-section">
+                <div class="upload-box" id="faceBox" onclick="document.getElementById('faceInput').click()">
+                    <div class="upload-label">📷 صورة الوجه (الأمام)</div>
+                    <p>اضغط لاختيار الصورة</p>
+                    <input type="file" id="faceInput" accept="image/*" onchange="previewImage(this, 'faceBox', 'facePreview')">
+                    <img id="facePreview" style="display:none">
+                </div>
+
+                <div class="upload-box" id="backBox" onclick="document.getElementById('backInput').click()">
+                    <div class="upload-label">📷 الخلفية (العنوان)</div>
+                    <p>اضغط لاختيار الصورة</p>
+                    <input type="file" id="backInput" accept="image/*" onchange="previewImage(this, 'backBox', 'backPreview')">
+                    <img id="backPreview" style="display:none">
+                </div>
+            </div>
+
+            <button class="btn" id="processBtn" onclick="processImages()" disabled>
+                🔍 معالجة البطاقة
+            </button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>جاري معالجة البطاقة...</p>
+        </div>
+
+        <div id="resultsCard" class="card" style="display:none">
+            <h2>📋 البيانات المستخرجة</h2>
+            <div class="results" id="results"></div>
+
+            <div class="section-title">النص المستخرج (قبل التصحيح)</div>
+            <div class="ocr-text" id="rawOcr"></div>
+
+            <div class="section-title">النص بعد التصحيح</div>
+            <div class="ocr-text" id="correctedText"></div>
+        </div>
+
+        <div id="errorBox" class="error" style="display:none"></div>
+    </div>
+
+    <script>
+        let uploadId = null;
+
+        function previewImage(input, boxId, previewId) {
+            const box = document.getElementById(boxId);
+            const preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    box.classList.add('has-file');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+
+            checkUploadReady();
+        }
+
+        function checkUploadReady() {
+            const faceInput = document.getElementById('faceInput');
+            const backInput = document.getElementById('backInput');
+            const processBtn = document.getElementById('processBtn');
+
+            processBtn.disabled = !(faceInput.files.length && backInput.files.length);
+        }
+
+        async function processImages() {
+            const faceInput = document.getElementById('faceInput');
+            const backInput = document.getElementById('backInput');
+            const loading = document.getElementById('loading');
+            const errorBox = document.getElementById('errorBox');
+            const resultsCard = document.getElementById('resultsCard');
+
+            errorBox.style.display = 'none';
+            resultsCard.style.display = 'none';
+            loading.classList.add('show');
+
+            try {
+                const formData = new FormData();
+                formData.append('face', faceInput.files[0]);
+                formData.append('back', backInput.files[0]);
+
+                const uploadResponse = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const uploadData = await uploadResponse.json();
+                if (!uploadResponse.ok) {
+                    throw new Error(uploadData.detail || 'Upload failed');
+                }
+
+                uploadId = uploadData.upload_id;
+
+                const processResponse = await fetch(`/process/${uploadId}`, {
+                    method: 'POST'
+                });
+
+                const processData = await processResponse.json();
+
+                if (!processData.success) {
+                    throw new Error(processData.error || 'Processing failed');
+                }
+
+                displayResults(processData);
+
+            } catch (error) {
+                errorBox.textContent = '❌ خطأ: ' + error.message;
+                errorBox.style.display = 'block';
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const rawOcrDiv = document.getElementById('rawOcr');
+            const correctedDiv = document.getElementById('correctedText');
+            const resultsCard = document.getElementById('resultsCard');
+
+            const fields = [
+                { key: 'name', label: 'الاسم' },
+                { key: 'national_id', label: 'الرقم القومي' },
+                { key: 'address', label: 'العنوان' },
+                { key: 'date_of_birth', label: 'تاريخ الميلاد' },
+                { key: 'gender', label: 'النوع' },
+                { key: 'religion', label: 'الديانة' },
+                { key: 'marital_status', label: 'الحالة الزوجية' },
+                { key: 'expiry_date', label: 'ساريه حتي' },
+                { key: 'job', label: 'الوظيفة' }
+            ];
+
+            resultsDiv.innerHTML = fields.map(field => `
+                <div class="result-item">
+                    <span class="result-label">${field.label}</span>
+                    <span class="result-value">${data.data[field.key] || '-'}</span>
+                </div>
+            `).join('');
+
+            rawOcrDiv.textContent = data.raw_ocr_text || '';
+            correctedDiv.textContent = data.corrected_text || '';
+
+            resultsCard.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
