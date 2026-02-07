@@ -27,7 +27,7 @@ def fix_ocr_text(extracted_text: str) -> str:
 أرجع النص المصحح فقط بدون شرح."""
 
     response = client.responses.create(
-        model="gpt-5",
+        model="gpt-4.1-nano-2025-04-14",
         input=prompt
     )
 
