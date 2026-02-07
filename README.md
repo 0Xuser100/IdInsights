@@ -17,15 +17,15 @@ Upload Images (face + back)
         ▼
 ┌───────────────────┐
 │     OpenAI        │
-│     gpt-5         │──► Fixed Text (جمهوريهمصل → جمهوريه مصر)
-│  (Error Fixer)    │
+│     gpt-4.1-nano  │──► Fixed Text (جمهوريهمصل → جمهوريه مصر)
+│  -2025-04-14      │
 └───────────────────┘
         │
         ▼
 ┌───────────────────┐
 │     OpenAI        │
-│     gpt-5         │──► Structured JSON
-│ (Field Extractor) │
+│     gpt-4.1-nano  │──► Structured JSON
+│  -2025-04-14      │
 └───────────────────┘
         │
         ▼
