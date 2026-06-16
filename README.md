@@ -81,6 +81,9 @@ Extract structured data from Egyptian National ID cards using a multi-stage AI p
 # 1. Clone & install Python dependencies
 uv add fastapi uvicorn python-multipart google-cloud-documentai openai convex python-dotenv
 
+# Or use this faster method:
+uv sync
+
 # 2. Install Convex
 npm install
 npx convex dev
