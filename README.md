@@ -1,5 +1,7 @@
 # Egyptian National ID Scanner
 
+![IdInsights — Intelligent Document Extraction](assets/banner.webp)
+
 Extract structured data from Egyptian National ID cards using a multi-stage AI pipeline: Google Document AI for OCR, OpenAI for text correction and field extraction, with a modern Next.js frontend.
 
 ## Tech Stack
